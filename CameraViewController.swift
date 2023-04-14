@@ -46,7 +46,7 @@ class CameraViewController: UIViewController {
                 cameraView.previewLayer.videoGravity = .resizeAspectFill
                 try setupAVSession()
                 cameraView.previewLayer.session = cameraFeedSession
-                cameraView.previewLayer.connection?.videoOrientation = .landscapeLeft                
+                cameraView.previewLayer.connection?.videoOrientation = .landscapeRight
             }
             cameraFeedSession?.startRunning()
         } catch {

@@ -10,7 +10,8 @@ struct ContentView: View {
                 HStack{
                     Spacer()
                     HandCameraView()
-                        .frame(width: 200, height: 200)
+                        .frame(width: 200, height: 400)
+                        .cornerRadius(20)
                         .padding(.trailing, 100)
                 }
                 Spacer()
