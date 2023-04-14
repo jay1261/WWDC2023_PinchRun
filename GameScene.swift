@@ -17,6 +17,7 @@ class GameScene: SKScene {
         createBackground()
         createLand()
         createCat()
+        createInfiniteObs(duration: 3)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -42,6 +43,7 @@ class GameScene: SKScene {
             // 점프
             self.cat.physicsBody?.velocity = (CGVector(dx: 0, dy: 0))
             self.cat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 70000))
+            cat.zRotation = CGFloat(0)
         }
     }
     
@@ -101,7 +103,7 @@ class GameScene: SKScene {
             
             land.physicsBody = SKPhysicsBody(rectangleOf: land.size,
                                              center: CGPoint(x: land.size.width / 2,
-                                                             y: land.size.height / 2))
+                                                             y: land.size.height / 2 - 30))
             land.physicsBody?.categoryBitMask = UInt32(0x1 << 1) // 2
             land.physicsBody?.affectedByGravity = false
             land.physicsBody?.isDynamic = false
@@ -114,6 +116,72 @@ class GameScene: SKScene {
             let moveSequence = SKAction.sequence([moveLeft, moveReset])
             land.run(SKAction.repeatForever(moveSequence))
         }
+    }
+    
+    func createObstacle(){
+        let envAtlas = SKTextureAtlas(named: "Environment")
+        let obstacleTexture = envAtlas.textureNamed("obstacle")
+        
+        // 장애물
+        let obstacle = SKSpriteNode(texture: obstacleTexture)
+        obstacle.zPosition = CGFloat(2)
+        obstacle.physicsBody = SKPhysicsBody(rectangleOf: obstacleTexture.size())
+        obstacle.physicsBody?.categoryBitMask = UInt32(0x1 << 3)  // 8
+        
+        addChild(obstacle)
+        
+        // 장애물 이동
+        let max = self.size.height * 0.3    //??
+        let xPos = self.size.width - obstacle.size.width
+        let yPos = CGFloat(arc4random_uniform(UInt32(max)))
+            + (envAtlas.textureNamed("land").size().height)
+        let endPos = self.size.width + (obstacle.size.width * 2)
+        obstacle.position = CGPoint(x: xPos, y: yPos)
+        let moveAct = SKAction.moveBy(x: -endPos, y: 0, duration: 6)
+        let moveSeq = SKAction.sequence([moveAct, SKAction.removeFromParent()])
+        
+        obstacle.run(moveSeq)
+
+/*
+        let pipeCollision = SKSpriteNode(color: UIColor.red,
+                                         size: CGSize(width: 1, height: self.size.height))
+        pipeCollision.zPosition = Layer.pipe // 2
+        pipeCollision.physicsBody = SKPhysicsBody(rectangleOf: pipeCollision.size)
+        pipeCollision.physicsBody?.categoryBitMask = PhysicsCategory.score
+        pipeCollision.physicsBody?.isDynamic = false
+        pipeCollision.name = "pipeCollision"
+        
+        addChild(pipeDown)
+        addChild(pipeCollision)
+        
+        
+        // 스프라이트 배치
+        let max = self.size.height * 0.3
+        let xPos = self.size.width + pipeUp.size.width
+        let yPos = CGFloat(arc4random_uniform(UInt32(max)))
+            + envAtlas.textureNamed("land").size().height
+        let endPos = self.size.width + (pipeDown.size.width * 2)
+        
+        pipeDown.position = CGPoint(x: xPos, y: yPos)
+        pipeUp.position = CGPoint(x: xPos,
+                                  y: pipeDown.position.y + pipeDistance + pipeUp.size.height)
+        pipeCollision.position = CGPoint(x: xPos, y: self.size.height / 2)
+        
+        let moveAct = SKAction.moveBy(x: -endPos, y: 0, duration: 6)
+        let moveSeq = SKAction.sequence([moveAct, SKAction.removeFromParent()])
+        pipeDown.run(moveSeq)
+        pipeUp.run(moveSeq)
+        pipeCollision.run(moveSeq)
+*/
+    }
+    
+    func createInfiniteObs(duration: TimeInterval){
+        let create = SKAction.run { [unowned self] in
+            self.createObstacle()
+        }
+        let wait = SKAction.wait(forDuration: duration)
+        let actSeq = SKAction.sequence([create, wait])
+        run(SKAction.repeatForever(actSeq))
     }
     
 }
