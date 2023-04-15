@@ -21,7 +21,7 @@ class HandGestureProcessor {
     
     typealias PointsPair = (thumbTip: CGPoint, indexTip: CGPoint, middleTip: CGPoint, ringTip: CGPoint, littleTip: CGPoint)
     
-    private var state = State.unknown {
+    var state = State.unknown {
         didSet {
             didChangeStateClosure?(state)
         }
@@ -63,6 +63,7 @@ class HandGestureProcessor {
             pinchEvidenceCounter = 0
             // Set new state based on evidence amount.
             state = (apartEvidenceCounter >= evidenceCounterStateTrigger) ? .apart : .apart
+            HandGestureProcessor.isPinched = false
         }
     }
 }
