@@ -2,19 +2,25 @@ import SwiftUI
 import SpriteKit
 
 struct ContentView: View {
+    @State var isPlaying: Bool = false
     
     var body: some View {
-        ZStack{
-            MyGameView()
-            VStack{
-                HStack{
+        if !isPlaying{
+            MainView(isPlaying: $isPlaying)
+        }
+        else {
+            ZStack{
+                MyGameView()
+                VStack{
+                    HStack{
+                        Spacer()
+                        HandCameraView()
+                            .frame(width: 400, height: 300)
+                            .cornerRadius(20)
+                            .padding(.trailing, 30)
+                    }
                     Spacer()
-                    HandCameraView()
-                        .frame(width: 400, height: 300)
-                        .cornerRadius(20)
-                        .padding(.trailing, 30)
                 }
-                Spacer()
             }
         }
     }
@@ -22,6 +28,7 @@ struct ContentView: View {
 
 
 struct HandCameraView: UIViewControllerRepresentable {
+    
     func makeUIViewController(context: Context) -> CameraViewController {
         
         // Load Main.storyboard
@@ -56,4 +63,6 @@ struct MyGameView: View {
                 .frame(width: geometry.size.width, height: geometry.size.height)
         }.edgesIgnoringSafeArea(.all)
     }
+    
 }
+

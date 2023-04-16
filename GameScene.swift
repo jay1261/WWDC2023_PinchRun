@@ -7,20 +7,22 @@
 import SpriteKit
 import SwiftUI
 
-struct PhysicsCategory {
-    static let cat: UInt32 = 0x1 << 0  // 1
-    static let land: UInt32 = 0x1 << 1  // 2
-    static let obstacle: UInt32 = 0x1 << 2  // 4
-    static let score: UInt32 = 0x1 << 3 // 8
+enum GameState {
+    case ready
+    case playing
+    case dead
 }
 
-
 class GameScene: SKScene, SKPhysicsContactDelegate {
-    private var gestureProcessor = HandGestureProcessor()
+
     //---Cat---
     var canJump = true
     //---------
+    let cameraNode = SKCameraNode()
     
+    var timer: Timer?
+    var timerNum: Int = 0
+    var timerLabel: SKLabelNode!
     
     var cat = SKSpriteNode()
     
@@ -34,6 +36,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         createLand()
         createCat()
         createInfiniteObs(duration: 3)
+        
+        camera = cameraNode
+        cameraNode.position.x = self.size.width / 2
+        cameraNode.position.y = self.size.height / 2
+        self.addChild(cameraNode)
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            self.timerNum += 1
+        }
+        
+        timerLabel = SKLabelNode(text: "0.0")
+        timerLabel.fontSize = 20
+        timerLabel.position = CGPoint(x: size.width/2, y: size.height/2)
+        addChild(timerLabel)
+
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -48,6 +65,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func update(_ currentTime: TimeInterval) {
+
+        timerLabel.text = "\(self.timerNum)"
+
+        
         cat.zRotation = CGFloat(0)
         
         if(HandGestureProcessor.isPinched == true && canJump){
@@ -60,7 +81,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func didBegin(_ contact: SKPhysicsContact) {
         var collideBody = SKPhysicsBody()
-
+        
         if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask {
             collideBody = contact.bodyB
         } else {
@@ -74,14 +95,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.canJump = true
             break
         case PhysicsCategory.obstacle:
-            print("obstacle")
+            print("obstacle, ")
+            cameraShake()
+            damageEffect()
+            // 새로운 뷰 만들어서 띄우기
+            let gameOverView = GameOverView(score: timerNum)
+            let viewController = UIHostingController(rootView: gameOverView)
+            if let view = self.view {
+                viewController.view.frame = view.bounds
+                viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                view.addSubview(viewController.view)
+            }
+            timer?.invalidate()
+            timer = nil
             break
         default:
             break
         }
-//        if contact.bodyA.node?.name == "cat" && contact.bodyB.node?.name == "land"{
-//            print("land")
-//        }
     }
     
     
@@ -196,4 +226,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         run(SKAction.repeatForever(actSeq))
     }
     
+    func cameraShake() {
+        let moveLeft = SKAction.moveTo(x: self.size.width / 2 - 5, duration: 0.1)
+        let moveRight = SKAction.moveTo(x: self.size.width / 2 + 5, duration: 0.1)
+        let moveReset = SKAction.moveTo(x: self.size.width / 2, duration: 0.1)
+        let shakeAction = SKAction.sequence([moveLeft, moveRight, moveLeft, moveRight, moveReset])
+        shakeAction.timingMode = .easeInEaseOut
+        self.cameraNode.run(shakeAction)
+    }
+    
+    func damageEffect() {
+        let flashNode = SKSpriteNode(color: UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.7),
+                                     size: self.size)
+        let actionSequence = SKAction.sequence([SKAction.wait(forDuration: 0.01),
+                                                SKAction.removeFromParent()])
+        flashNode.name = "flashNode"
+        flashNode.position = CGPoint(x: self.size.width / 2, y: self.size.height / 2)
+        flashNode.zPosition = CGFloat(10)
+        addChild(flashNode)
+        flashNode.run(actionSequence)
+    }
 }
