@@ -28,7 +28,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func didMove(to view: SKView) {
 //        physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
-        let gravity = -6.8 - K.gameLevel // 7.8 8.8 9.8   1 2 3
+        let gravity = -6.8 - Double(K.gameLevel) // 7.8 8.8 9.8   1 2 3
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector(dx: 0, dy: gravity)   // -9.8
         
@@ -47,7 +47,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         
         timerLabel = SKLabelNode(text: "0.0")
-        timerLabel.fontSize = 20
+        timerLabel.fontName = "Copperplate"
+        timerLabel.fontSize = 30
+    
         timerLabel.position = CGPoint(x: size.width/2, y: size.height * 0.9)
         addChild(timerLabel)
         
@@ -65,16 +67,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
         
-        let box = SKSpriteNode(color: .red, size: CGSize(width: 150, height: 50))
-        box.position = location
-        box.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 150, height: 50))
-        
-        addChild(box) // 오브젝트 뷰에 추가
+//        let box = SKSpriteNode(color: .red, size: CGSize(width: 150, height: 50))
+//        box.position = location
+//        box.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 150, height: 50))
+//
+//        addChild(box) // 오브젝트 뷰에 추가
     }
     
     override func update(_ currentTime: TimeInterval) {
 
-        timerLabel.text = "Score: \(self.timerNum)"
+        timerLabel.text = "Time: \(self.timerNum)"
         
         
         cat.zRotation = CGFloat(0)
@@ -109,7 +111,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             damageEffect()
             
             // 새로운 뷰 만들어서 띄우기
-            let gameOverView = GameOverView(score: timerNum)
+            let score = timerNum * K.gameLevel
+            let gameOverView = GameOverView(score: score)
             let viewController = UIHostingController(rootView: gameOverView)
             if let view = self.view {
                 viewController.view.frame = view.bounds
@@ -211,7 +214,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         obstacle.zPosition = CGFloat(2)
         obstacle.physicsBody = SKPhysicsBody(rectangleOf: obstacleTexture.size())
         obstacle.physicsBody?.categoryBitMask = PhysicsCategory.obstacle
-        obstacle.setScale(0.5)
+        obstacle.setScale(0.2)
         addChild(obstacle)
         
         // 장애물 이동

@@ -14,7 +14,10 @@ struct GameOverView: View {
             Image("mainBackground")
                 .edgesIgnoringSafeArea(.all)
             VStack{
-                Text("\(score)")
+                Text("Score: \(score)")
+                    .font(.custom("Copperplate", size: 50))
+                    .foregroundColor(.white)
+                    .padding(20)
                 
                 Button{
                     // 앱 전체를 재실행 하는 느낌의 코드 (재시작 버튼에 넣을 코드)
@@ -22,7 +25,7 @@ struct GameOverView: View {
                         window.rootViewController = UIHostingController(rootView: ContentView())
                     }
                 } label: {
-                    Text("Restart")
+                    Image("restart")
                 }
             }
         }

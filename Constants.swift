@@ -17,5 +17,5 @@ struct PhysicsCategory {
 }
 
 struct K {
-    static var gameLevel: Double = 2  // 1, 2, 3
+    static var gameLevel: Int = 1  // 1, 2, 3
 }
