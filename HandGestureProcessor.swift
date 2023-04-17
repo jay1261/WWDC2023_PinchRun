@@ -13,6 +13,7 @@ import CoreGraphics
 
 class HandGestureProcessor {
     static var isPinched = false
+    static var isAparted = false
     enum State {
         case pinched
         case apart
@@ -64,6 +65,7 @@ class HandGestureProcessor {
             // Set new state based on evidence amount.
             state = (apartEvidenceCounter >= evidenceCounterStateTrigger) ? .apart : .apart
             HandGestureProcessor.isPinched = false
+            HandGestureProcessor.isAparted = true
         }
     }
 }

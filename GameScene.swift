@@ -27,10 +27,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var cat = SKSpriteNode()
     
     override func didMove(to view: SKView) {
-        physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
-        
+//        physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
+        let gravity = -6.8 - K.gameLevel // 7.8 8.8 9.8   1 2 3
         self.physicsWorld.contactDelegate = self
-        self.physicsWorld.gravity = CGVector(dx: 0, dy: -7.8)   // -9.8
+        self.physicsWorld.gravity = CGVector(dx: 0, dy: gravity)   // -9.8
         
         createBackground()
         createLand()
@@ -48,9 +48,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         timerLabel = SKLabelNode(text: "0.0")
         timerLabel.fontSize = 20
-        timerLabel.position = CGPoint(x: size.width/2, y: size.height/2)
+        timerLabel.position = CGPoint(x: size.width/2, y: size.height * 0.9)
         addChild(timerLabel)
-
+        
+        // 게임 스피드
+        if K.gameLevel == 1 {
+            speed = 1
+        } else if K.gameLevel == 2{
+            speed = 1.5
+        } else {
+            speed = 2
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -66,13 +74,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func update(_ currentTime: TimeInterval) {
 
-        timerLabel.text = "\(self.timerNum)"
-
+        timerLabel.text = "Score: \(self.timerNum)"
+        
         
         cat.zRotation = CGFloat(0)
-        
-        if(HandGestureProcessor.isPinched == true && canJump){
+        // 손 감지 -> 점프
+        if(HandGestureProcessor.isPinched == true && canJump && HandGestureProcessor.isAparted){
             canJump = false
+            HandGestureProcessor.isAparted = false
             // 점프
             self.cat.physicsBody?.velocity = (CGVector(dx: 0, dy: 0))
             self.cat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 100000))
@@ -98,6 +107,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             print("obstacle, ")
             cameraShake()
             damageEffect()
+            
             // 새로운 뷰 만들어서 띄우기
             let gameOverView = GameOverView(score: timerNum)
             let viewController = UIHostingController(rootView: gameOverView)
@@ -205,10 +215,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(obstacle)
         
         // 장애물 이동
-        let max = self.size.height * 0.3    //??
-        let xPos = self.size.width - obstacle.size.width
-        let yPos = CGFloat(arc4random_uniform(UInt32(max)))
-            + (envAtlas.textureNamed("land").size().height)
+//        let max = self.size.height * 0.3    //??
+        
+        let xPos = self.size.width
+        let yPos = (envAtlas.textureNamed("land").size().height) //CGFloat(arc4random_uniform(UInt32(max)))
+             
         let endPos = self.size.width + (obstacle.size.width * 2)
         obstacle.position = CGPoint(x: xPos, y: yPos)
         let moveAct = SKAction.moveBy(x: -endPos, y: 0, duration: 6)
@@ -218,10 +229,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func createInfiniteObs(duration: TimeInterval){
+        
         let create = SKAction.run { [unowned self] in
             self.createObstacle()
         }
-        let wait = SKAction.wait(forDuration: duration)
+        let wait = SKAction.wait(forDuration: duration, withRange: 2)
         let actSeq = SKAction.sequence([create, wait])
         run(SKAction.repeatForever(actSeq))
     }
