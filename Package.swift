@@ -8,15 +8,15 @@ import PackageDescription
 import AppleProductTypes
 
 let package = Package(
-    name: "PinchGame",
+    name: "PinchRun",
     platforms: [
         .iOS("15.2")
     ],
     products: [
         .iOSApplication(
-            name: "PinchGame",
+            name: "PinchRun",
             targets: ["AppModule"],
-            bundleIdentifier: "com.jay.PinchAR",
+            bundleIdentifier: "com.jay.PinchRun",
             teamIdentifier: "RXP67AQN3R",
             displayVersion: "1.0",
             bundleVersion: "1",
@@ -27,11 +27,7 @@ let package = Package(
                 .phone
             ],
             supportedInterfaceOrientations: [
-                .landscapeLeft,
-                .portrait,
-                .landscapeRight,
-                .landscapeLeft,
-                .portraitUpsideDown(.when(deviceFamilies: [.pad]))
+                .landscapeRight
             ],
             capabilities: [
                 .camera(purposeString: "To Track Handpose")
@@ -41,7 +37,10 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "AppModule",
-            path: "."
+            path: ".",
+            resources: [
+                .process("Resources")
+            ]
         )
     ]
 )

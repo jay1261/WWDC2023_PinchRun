@@ -36,7 +36,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         createLand()
         createCat()
         createInfiniteObs(duration: 3)
-        
+                
         camera = cameraNode
         cameraNode.position.x = self.size.width / 2
         cameraNode.position.y = self.size.height / 2
@@ -64,8 +64,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
-        let location = touch.location(in: self)
+//        guard let touch = touches.first else { return }
+//        let location = touch.location(in: self)
         
 //        let box = SKSpriteNode(color: .red, size: CGSize(width: 150, height: 50))
 //        box.position = location
@@ -86,7 +86,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             HandGestureProcessor.isAparted = false
             // 점프
             self.cat.physicsBody?.velocity = (CGVector(dx: 0, dy: 0))
-            self.cat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 100000))
+            self.cat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 75000))
         }
     }
     
@@ -111,13 +111,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             damageEffect()
             
             // 새로운 뷰 만들어서 띄우기
+            self.cat.removeAllActions()
+            speed = 0.1
             let score = timerNum * K.gameLevel
-            let gameOverView = GameOverView(score: score)
-            let viewController = UIHostingController(rootView: gameOverView)
-            if let view = self.view {
-                viewController.view.frame = view.bounds
-                viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                view.addSubview(viewController.view)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
+                let gameOverView = GameOverView(score: score)
+                let viewController = UIHostingController(rootView: gameOverView)
+                if let view = self.view {
+                    viewController.view.frame = view.bounds
+                    viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                    view.addSubview(viewController.view)
+                }
             }
             timer?.invalidate()
             timer = nil
@@ -136,7 +140,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         cat = SKSpriteNode(imageNamed: "cat1")
         cat.position = CGPoint(x: self.size.width / 4, y: self.size.height / 2)
         cat.zPosition = CGFloat(2)
-        cat.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: cat.size.width, height: cat.size.height))
+        cat.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 1300, height: 1532)) //width: 1824.0, height: 1532.0
+        print("width: \(cat.size.width), height: \(cat.size.height)")
         cat.physicsBody?.categoryBitMask = PhysicsCategory.cat
         cat.name = "cat"
         cat.physicsBody?.contactTestBitMask = PhysicsCategory.land | PhysicsCategory.obstacle  // 2, 8
@@ -163,6 +168,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         for i in 0...skyRepeatNum {
             let sky = SKSpriteNode(texture: skyTexture)
             sky.anchorPoint = CGPoint.zero
+            // 사이즈 맞추기
+            sky.size = CGSize(width: sky.size.width, height: self.size.height)
+            
             sky.position = CGPoint(x: CGFloat(i) * sky.size.width, y: 0)
             sky.zPosition = CGFloat(0)
             addChild(sky)
@@ -184,6 +192,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         for i in 0...landRepeatNum {
             let land = SKSpriteNode(texture: landTexture)
             land.anchorPoint = CGPoint.zero
+//            땅 사이즈...
+//            land.size = CGSize(width: land.size.width, height: self.size.height / 4)
             land.position = CGPoint(x: CGFloat(i) * land.size.width, y: 0)
             land.zPosition = CGFloat(2)
             
@@ -197,7 +207,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             addChild(land)
             
             let moveLeft = SKAction.moveBy(x: -landTexture.size().width,
-                                           y: 0, duration: 20)
+                                           y: 0, duration: 15.3)//20
             let moveReset = SKAction.moveBy(x: landTexture.size().width,
                                             y: 0, duration: 0)
             let moveSequence = SKAction.sequence([moveLeft, moveReset])
@@ -261,4 +271,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(flashNode)
         flashNode.run(actionSequence)
     }
+    
+    
 }

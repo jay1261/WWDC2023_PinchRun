@@ -12,6 +12,8 @@ struct GameOverView: View {
     var body: some View {
         ZStack{
             Image("mainBackground")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
                 .edgesIgnoringSafeArea(.all)
             VStack{
                 Text("Score: \(score)")
@@ -35,5 +37,6 @@ struct GameOverView: View {
 struct GameOverView_Previews: PreviewProvider {
     static var previews: some View {
         GameOverView(score: 10)
+            .previewInterfaceOrientation(.landscapeRight)
     }
 }

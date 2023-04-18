@@ -2,6 +2,7 @@ import SwiftUI
 import SpriteKit
 
 struct ContentView: View {
+    
     @State var isPlaying: Bool = false
     
     var body: some View {
@@ -57,12 +58,14 @@ struct MyGameView: View {
         return scene
     }
     
+    
     var body: some View {
         GeometryReader { geometry in
             SpriteView(scene: sizedScene(size: CGSize(width: geometry.size.width, height: geometry.size.height)))
                 .frame(width: geometry.size.width, height: geometry.size.height)
-        }.edgesIgnoringSafeArea(.all)
+        }
+        .edgesIgnoringSafeArea(.all)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    
 }
 
