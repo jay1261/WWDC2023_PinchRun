@@ -1,14 +1,13 @@
 # WWDC2023_PinchGame
+<div>
 for WWDC2023 Swift Student Challenge
----
+</div>
+
 ## Demo
 <div align="center">
 
 ![demo](https://user-images.githubusercontent.com/99792672/233139292-471645ad-6318-464c-a589-8fe820b339e6.gif)
-
-</br>
-
-
+</div>
 
 </br>
 
