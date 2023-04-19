@@ -1,4 +1,4 @@
-# WWDC2023_PinchGame
+# WWDC2023_PinchRun
 <div>
 for WWDC2023 Swift Student Challenge
 </div>
